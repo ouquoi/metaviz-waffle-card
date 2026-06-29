@@ -8,14 +8,29 @@ const COLORS = [
   "#7172AD", "#F2A86F", "#4C5773", "#A989C5", "#EDA1D5",
 ];
 
+// Returns the number of data rows — used to show/hide per-series settings.
+// getHidden receives (settings, extra) where extra.series is the raw series array,
+// or falls back to treating the first arg as a series array (older Metabase builds).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function rowCount(series: any): number {
-  return series?.[0]?.data?.rows?.length ?? 0;
+function seriesCount(s: any, extra?: any): number {
+  const rows =
+    extra?.series?.[0]?.data?.rows ??
+    extra?.rawSeries?.[0]?.data?.rows ??
+    s?.[0]?.data?.rows;
+  return rows?.length ?? 0;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyDef = any;
 
 const createVisualization: CreateCustomVisualization<Settings> = ({
   defineSetting,
 }) => {
+  // Wrapper that bypasses SDK types to allow getHidden (supported at runtime
+  // in Metabase but absent from @metabase/custom-viz type definitions).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ds = (def: AnyDef) => (defineSetting as any)(def);
+
   return defineConfig<Settings>({
     id: "waffle-chart",
     getName: () => "Waffle Chart",
@@ -52,6 +67,24 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         title: "Rows",
         widget: "number",
         getDefault() { return 5; },
+      }),
+      cellSize: defineSetting({
+        id: "cellSize",
+        title: "Cell size",
+        widget: "select",
+        getDefault() { return "auto"; },
+        getProps() {
+          return {
+            options: [
+              { name: "Auto (fill card)", value: "auto" },
+              { name: "XS — 8 px", value: "xs" },
+              { name: "S — 12 px", value: "s" },
+              { name: "M — 18 px", value: "m" },
+              { name: "L — 26 px", value: "l" },
+              { name: "XL — 36 px", value: "xl" },
+            ],
+          };
+        },
       }),
       mode: defineSetting({
         id: "mode",
@@ -130,25 +163,25 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         },
       }),
 
-      // Per-category color overrides (indexed by sorted display order)
-      series_0_color: defineSetting({ id: "series_0_color", title: "Series 1 — Color", widget: "color", getDefault() { return COLORS[0]; } }),
-      series_1_color: defineSetting({ id: "series_1_color", title: "Series 2 — Color", widget: "color", getDefault() { return COLORS[1]; } }),
-      series_2_color: defineSetting({ id: "series_2_color", title: "Series 3 — Color", widget: "color", getDefault() { return COLORS[2]; } }),
-      series_3_color: defineSetting({ id: "series_3_color", title: "Series 4 — Color", widget: "color", getDefault() { return COLORS[3]; } }),
-      series_4_color: defineSetting({ id: "series_4_color", title: "Series 5 — Color", widget: "color", getDefault() { return COLORS[4]; } }),
-      series_5_color: defineSetting({ id: "series_5_color", title: "Series 6 — Color", widget: "color", getDefault() { return COLORS[5]; } }),
-      series_6_color: defineSetting({ id: "series_6_color", title: "Series 7 — Color", widget: "color", getDefault() { return COLORS[6]; } }),
-      series_7_color: defineSetting({ id: "series_7_color", title: "Series 8 — Color", widget: "color", getDefault() { return COLORS[7]; } }),
+      // Per-series color overrides — shown only when the series exists in the data
+      series_0_color: ds({ id: "series_0_color", title: "Series 1 — Color", widget: "color", getDefault() { return COLORS[0]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
+      series_1_color: ds({ id: "series_1_color", title: "Series 2 — Color", widget: "color", getDefault() { return COLORS[1]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
+      series_2_color: ds({ id: "series_2_color", title: "Series 3 — Color", widget: "color", getDefault() { return COLORS[2]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
+      series_3_color: ds({ id: "series_3_color", title: "Series 4 — Color", widget: "color", getDefault() { return COLORS[3]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
+      series_4_color: ds({ id: "series_4_color", title: "Series 5 — Color", widget: "color", getDefault() { return COLORS[4]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
+      series_5_color: ds({ id: "series_5_color", title: "Series 6 — Color", widget: "color", getDefault() { return COLORS[5]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
+      series_6_color: ds({ id: "series_6_color", title: "Series 7 — Color", widget: "color", getDefault() { return COLORS[6]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
+      series_7_color: ds({ id: "series_7_color", title: "Series 8 — Color", widget: "color", getDefault() { return COLORS[7]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
 
-      // Per-category label overrides
-      series_0_label: defineSetting({ id: "series_0_label", title: "Series 1 — Label", widget: "input", getDefault() { return ""; } }),
-      series_1_label: defineSetting({ id: "series_1_label", title: "Series 2 — Label", widget: "input", getDefault() { return ""; } }),
-      series_2_label: defineSetting({ id: "series_2_label", title: "Series 3 — Label", widget: "input", getDefault() { return ""; } }),
-      series_3_label: defineSetting({ id: "series_3_label", title: "Series 4 — Label", widget: "input", getDefault() { return ""; } }),
-      series_4_label: defineSetting({ id: "series_4_label", title: "Series 5 — Label", widget: "input", getDefault() { return ""; } }),
-      series_5_label: defineSetting({ id: "series_5_label", title: "Series 6 — Label", widget: "input", getDefault() { return ""; } }),
-      series_6_label: defineSetting({ id: "series_6_label", title: "Series 7 — Label", widget: "input", getDefault() { return ""; } }),
-      series_7_label: defineSetting({ id: "series_7_label", title: "Series 8 — Label", widget: "input", getDefault() { return ""; } }),
+      // Per-series label overrides — shown only when the series exists in the data
+      series_0_label: ds({ id: "series_0_label", title: "Series 1 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
+      series_1_label: ds({ id: "series_1_label", title: "Series 2 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
+      series_2_label: ds({ id: "series_2_label", title: "Series 3 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
+      series_3_label: ds({ id: "series_3_label", title: "Series 4 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
+      series_4_label: ds({ id: "series_4_label", title: "Series 5 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
+      series_5_label: ds({ id: "series_5_label", title: "Series 6 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
+      series_6_label: ds({ id: "series_6_label", title: "Series 7 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
+      series_7_label: ds({ id: "series_7_label", title: "Series 8 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
     },
 
     VisualizationComponent: WaffleChart,

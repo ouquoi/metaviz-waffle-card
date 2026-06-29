@@ -38,6 +38,7 @@ export function WaffleChart({
 
   const gridColumns = settings?.gridColumns ?? 20;
   const gridRows = settings?.gridRows ?? 5;
+  const cellSize = settings?.cellSize ?? "auto";
   const mode = settings?.mode ?? "percent";
   const unitsPerCell = Math.max(1, settings?.unitsPerCell ?? 1);
   const fillDirection = settings?.fillDirection ?? "row-left-right";
@@ -138,12 +139,15 @@ export function WaffleChart({
   });
   while (seq.length < totalCells) seq.push(-1);
 
-  // Layout — cellW and cellH independent so the grid fills both axes
+  // Layout
   const legendVisible = showLegend && categories.length > 0;
   const svgH = ch - (legendVisible ? LEGEND_H : 0);
 
-  const cellW = Math.max(4, Math.floor((cw - 2 * MARGIN - GAP * (gridColumns - 1)) / gridColumns));
-  const cellH = Math.max(4, Math.floor((svgH - 2 * MARGIN - GAP * (gridRows - 1)) / gridRows));
+  const FIXED_SIZES: Record<string, number> = { xs: 8, s: 12, m: 18, l: 26, xl: 36 };
+  const fixedPx = cellSize !== "auto" ? FIXED_SIZES[cellSize] : null;
+
+  const cellW = fixedPx ?? Math.max(4, Math.floor((cw - 2 * MARGIN - GAP * (gridColumns - 1)) / gridColumns));
+  const cellH = fixedPx ?? Math.max(4, Math.floor((svgH - 2 * MARGIN - GAP * (gridRows - 1)) / gridRows));
 
   const gridW = cellW * gridColumns + GAP * (gridColumns - 1);
   const gridH = cellH * gridRows + GAP * (gridRows - 1);
