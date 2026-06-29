@@ -18,7 +18,6 @@ interface Category {
 }
 
 const GAP = 4;
-const PADDING = 12;
 const ANIM = `@keyframes waffleIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}`;
 
 export function WaffleChart({
@@ -121,25 +120,26 @@ export function WaffleChart({
   });
   while (seq.length < totalCells) seq.push(-1);
 
-  // Layout
+  // Layout — le SVG prend toute la hauteur sauf la légende
   const LEGEND_H = showLegend && categories.length > 0 ? 30 : 0;
-  const availW = width - PADDING * 2;
-  const availH = height - PADDING * 2 - LEGEND_H;
+  const svgH = height - LEGEND_H;
+  const MARGIN = 8; // marge minimale autour de la grille
 
   const cellSize = Math.max(
     4,
     Math.floor(
       Math.min(
-        (availW - GAP * (gridColumns - 1)) / gridColumns,
-        (availH - GAP * (gridRows - 1)) / gridRows,
+        (width - 2 * MARGIN - GAP * (gridColumns - 1)) / gridColumns,
+        (svgH - 2 * MARGIN - GAP * (gridRows - 1)) / gridRows,
       ),
     ),
   );
 
   const gridW = cellSize * gridColumns + GAP * (gridColumns - 1);
   const gridH = cellSize * gridRows + GAP * (gridRows - 1);
+  // Centrer la grille dans le SVG dans les deux axes
   const gx = (width - gridW) / 2;
-  const gy = PADDING;
+  const gy = (svgH - gridH) / 2;
 
   // Map linear index → grid position
   function cellPos(idx: number): { col: number; row: number } {
@@ -170,15 +170,10 @@ export function WaffleChart({
         backgroundColor: bgColor,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
         position: "relative",
-        overflow: "hidden",
         boxSizing: "border-box",
       }}
     >
-      <style>{ANIM}</style>
-
       {/* Tooltip */}
       {hovered && (
         <div
@@ -211,17 +206,19 @@ export function WaffleChart({
       {/* SVG waffle grid */}
       <svg
         width={width}
-        height={gridH + gy * 2}
-        style={{ flexShrink: 0, display: "block" }}
+        height={svgH}
+        style={{ display: "block", flexShrink: 0 }}
         onMouseLeave={() => setHoveredCat(null)}
       >
+        <defs>
+          <style>{ANIM}</style>
+        </defs>
         {seq.map((catIdx, idx) => {
           const { col, row } = cellPos(idx);
           const x = gx + col * (cellSize + GAP);
           const y = gy + row * (cellSize + GAP);
           const color = catIdx >= 0 ? categories[catIdx].color : emptyColor;
-          const dim =
-            hoveredCat !== null && catIdx !== hoveredCat;
+          const dim = hoveredCat !== null && catIdx !== hoveredCat;
           return (
             <g
               key={idx}
@@ -257,6 +254,8 @@ export function WaffleChart({
                 style={{
                   animation: `waffleIn 0.28s ease-out both`,
                   animationDelay: `${idx * 7}ms`,
+                  transformBox: "fill-box",
+                  transformOrigin: "center",
                 }}
               />
             </g>
