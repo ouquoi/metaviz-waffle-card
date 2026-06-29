@@ -42,7 +42,7 @@ In the question editor, click the **visualization picker** (bottom left) and sel
 
 ### 3. Configure the settings
 
-Click the **gear icon** to open visualization settings.
+Click the **gear icon** to open visualization settings. Settings are organized into sections.
 
 #### Grid
 
@@ -50,8 +50,14 @@ Click the **gear icon** to open visualization settings.
 |---------|-------------|---------|
 | **Columns** | Number of columns in the grid | `20` |
 | **Rows** | Number of rows in the grid | `5` |
+| **Fill direction** | `Row, left to right` — fills left-to-right by row. `Column, bottom to top` — fills bottom-to-top by column | `Row, left to right` |
+
+#### Cells
+
+| Setting | Description | Default |
+|---------|-------------|---------|
 | **Cell shape** | Shape of each cell: `Rounded square`, `Square`, `Circle`, `Diamond`, `Cross`, `Star` | `Rounded square` |
-| **Cell size** | Fixed cell size: `Auto` (fills the card), `XS` (8 px), `S` (12 px), `M` (18 px), `L` (26 px), `XL` (36 px) | `Auto` |
+| **Cell size** | `Auto` (fills the card), `XS` (8 px), `S` (12 px), `M` (18 px), `L` (26 px), `XL` (36 px) | `Auto` |
 
 #### Data
 
@@ -59,7 +65,6 @@ Click the **gear icon** to open visualization settings.
 |---------|-------------|---------|
 | **Mode** | `Percent` — fills the grid proportionally (total = columns × rows cells). `Unit` — assigns 1 cell per N data units | `Percent` |
 | **Units per cell** | In `Unit` mode: how many data units each cell represents | `1` |
-| **Fill direction** | `Row, left to right` — fills left-to-right by row. `Column, bottom to top` — fills bottom-to-top by column | `Row, left to right` |
 | **Sort** | `Value descending` (largest first), `Value ascending` (smallest first), `Original order` | `Value descending` |
 | **Minimum 1 cell per category** | Guarantees every non-zero category gets at least 1 cell, even if its share rounds down to 0 | On |
 
@@ -70,14 +75,14 @@ Click the **gear icon** to open visualization settings.
 | **Show legend** | Show or hide the legend below the grid | On |
 | **Legend value** | What to show per legend item: `Percent`, `Value`, or `Both` | `Percent` |
 
-#### Series overrides
+#### Series 1 … Series N
 
-For each series present in the data (up to 8), two additional settings appear:
+One section per series present in the data (up to 8), shown dynamically based on query results.
 
 | Setting | Description |
 |---------|-------------|
-| **Series N — Color** | Custom color for this category |
-| **Series N — Label** | Custom display name for this category (overrides the raw value from the query) |
+| **Color** | Custom color for this series |
+| **Label** | Custom display name (overrides the raw value from the query) |
 
 Series are indexed in the sorted display order (as configured by the **Sort** setting).
 
