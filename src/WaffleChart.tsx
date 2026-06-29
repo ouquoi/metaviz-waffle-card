@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import { type CustomVisualizationProps } from "@metabase/custom-viz";
 import type { Settings } from "./types";
 import { isNumericCol, largestRemainder } from "./utils";
@@ -19,7 +19,7 @@ interface Category {
 
 const GAP = 3;
 const MARGIN = 6;
-const LEGEND_H = 28;
+const LEGEND_H_MIN = 24; // minimum legend height used on first render
 
 type Shape = "rounded" | "square" | "circle" | "diamond" | "cross" | "star";
 
@@ -86,6 +86,15 @@ export function WaffleChart({
   onClick,
 }: CustomVisualizationProps<Settings>) {
   const [hoveredCat, setHoveredCat] = useState<number | null>(null);
+  const legendRef = useRef<HTMLDivElement>(null);
+  const [legendH, setLegendH] = useState(LEGEND_H_MIN);
+
+  useLayoutEffect(() => {
+    if (legendRef.current) {
+      const h = legendRef.current.scrollHeight;
+      if (h > 0) setLegendH(h);
+    }
+  });
 
   const isDark = colorScheme === "dark";
   const bgColor = isDark ? "#1c1c1c" : "#ffffff";
@@ -198,7 +207,7 @@ export function WaffleChart({
 
   // Layout
   const legendVisible = showLegend && categories.length > 0;
-  const svgH = ch - (legendVisible ? LEGEND_H : 0);
+  const svgH = ch - (legendVisible ? legendH : 0);
 
   const FIXED_SIZES: Record<string, number> = { xs: 8, s: 12, m: 18, l: 26, xl: 36 };
   const fixedPx = cellSize !== "auto" ? FIXED_SIZES[cellSize] : null;
@@ -319,16 +328,15 @@ export function WaffleChart({
       {/* Legend */}
       {legendVisible && (
         <div
+          ref={legendRef}
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: "3px 14px",
+            gap: "4px 14px",
             justifyContent: "center",
             alignItems: "center",
-            height: LEGEND_H,
-            padding: "0 12px",
+            padding: "4px 12px",
             flexShrink: 0,
-            overflow: "hidden",
           }}
         >
           {categories.map((cat, i) => {
