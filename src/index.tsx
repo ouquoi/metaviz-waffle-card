@@ -9,8 +9,6 @@ const COLORS = [
 ];
 
 // Returns the number of data rows — used to show/hide per-series settings.
-// getHidden receives (settings, extra) where extra.series is the raw series array,
-// or falls back to treating the first arg as a series array (older Metabase builds).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function seriesCount(s: any, extra?: any): number {
   const rows =
@@ -26,8 +24,7 @@ type AnyDef = any;
 const createVisualization: CreateCustomVisualization<Settings> = ({
   defineSetting,
 }) => {
-  // Wrapper that bypasses SDK types to allow getHidden (supported at runtime
-  // in Metabase but absent from @metabase/custom-viz type definitions).
+  // Bypasses SDK types to allow getHidden (runtime-supported but not typed).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ds = (def: AnyDef) => (defineSetting as any)(def);
 
@@ -42,9 +39,7 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         throw new Error("Select a dimension and a metric");
       }
       const data = series[0]?.data;
-      if (!data) {
-        throw new Error("Select a dimension and a metric");
-      }
+      if (!data) throw new Error("Select a dimension and a metric");
       const cols = data.cols;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const hasDimension = (cols as any[]).some((c) => !isNumericCol(c));
@@ -56,22 +51,43 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
     },
 
     settings: {
+      // ── Grid ────────────────────────────────────────────────────────────
       gridColumns: defineSetting({
         id: "gridColumns",
         title: "Columns",
         widget: "number",
+        getSection() { return "Grid"; },
         getDefault() { return 20; },
       }),
       gridRows: defineSetting({
         id: "gridRows",
         title: "Rows",
         widget: "number",
+        getSection() { return "Grid"; },
         getDefault() { return 5; },
       }),
+      fillDirection: defineSetting({
+        id: "fillDirection",
+        title: "Fill direction",
+        widget: "select",
+        getSection() { return "Grid"; },
+        getDefault() { return "row-left-right"; },
+        getProps() {
+          return {
+            options: [
+              { name: "Row, left to right", value: "row-left-right" },
+              { name: "Column, bottom to top", value: "col-bottom-up" },
+            ],
+          };
+        },
+      }),
+
+      // ── Cells ───────────────────────────────────────────────────────────
       cellShape: defineSetting({
         id: "cellShape",
         title: "Cell shape",
         widget: "select",
+        getSection() { return "Cells"; },
         getDefault() { return "rounded"; },
         getProps() {
           return {
@@ -90,6 +106,7 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         id: "cellSize",
         title: "Cell size",
         widget: "select",
+        getSection() { return "Cells"; },
         getDefault() { return "auto"; },
         getProps() {
           return {
@@ -104,10 +121,13 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
           };
         },
       }),
+
+      // ── Data ────────────────────────────────────────────────────────────
       mode: defineSetting({
         id: "mode",
         title: "Mode",
         widget: "select",
+        getSection() { return "Data"; },
         getDefault() { return "percent"; },
         getProps() {
           return {
@@ -122,26 +142,14 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         id: "unitsPerCell",
         title: "Units per cell",
         widget: "number",
+        getSection() { return "Data"; },
         getDefault() { return 1; },
-      }),
-      fillDirection: defineSetting({
-        id: "fillDirection",
-        title: "Fill direction",
-        widget: "select",
-        getDefault() { return "row-left-right"; },
-        getProps() {
-          return {
-            options: [
-              { name: "Row, left to right", value: "row-left-right" },
-              { name: "Column, bottom to top", value: "col-bottom-up" },
-            ],
-          };
-        },
       }),
       sort: defineSetting({
         id: "sort",
         title: "Sort",
         widget: "select",
+        getSection() { return "Data"; },
         getDefault() { return "value_desc"; },
         getProps() {
           return {
@@ -157,18 +165,23 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         id: "minOneCell",
         title: "Minimum 1 cell per category",
         widget: "toggle",
+        getSection() { return "Data"; },
         getDefault() { return true; },
       }),
+
+      // ── Legend ──────────────────────────────────────────────────────────
       showLegend: defineSetting({
         id: "showLegend",
         title: "Show legend",
         widget: "toggle",
+        getSection() { return "Legend"; },
         getDefault() { return true; },
       }),
       legendValue: defineSetting({
         id: "legendValue",
         title: "Legend value",
         widget: "select",
+        getSection() { return "Legend"; },
         getDefault() { return "percent"; },
         getProps() {
           return {
@@ -181,25 +194,30 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         },
       }),
 
-      // Per-series color overrides — shown only when the series exists in the data
-      series_0_color: ds({ id: "series_0_color", title: "Series 1 — Color", widget: "color", getDefault() { return COLORS[0]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
-      series_1_color: ds({ id: "series_1_color", title: "Series 2 — Color", widget: "color", getDefault() { return COLORS[1]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
-      series_2_color: ds({ id: "series_2_color", title: "Series 3 — Color", widget: "color", getDefault() { return COLORS[2]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
-      series_3_color: ds({ id: "series_3_color", title: "Series 4 — Color", widget: "color", getDefault() { return COLORS[3]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
-      series_4_color: ds({ id: "series_4_color", title: "Series 5 — Color", widget: "color", getDefault() { return COLORS[4]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
-      series_5_color: ds({ id: "series_5_color", title: "Series 6 — Color", widget: "color", getDefault() { return COLORS[5]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
-      series_6_color: ds({ id: "series_6_color", title: "Series 7 — Color", widget: "color", getDefault() { return COLORS[6]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
-      series_7_color: ds({ id: "series_7_color", title: "Series 8 — Color", widget: "color", getDefault() { return COLORS[7]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
+      // ── Series (one section per series, shown only if series exists) ────
+      series_0_color: ds({ id: "series_0_color", title: "Color", widget: "color", getSection() { return "Series 1"; }, getDefault() { return COLORS[0]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
+      series_0_label: ds({ id: "series_0_label", title: "Label", widget: "input", getSection() { return "Series 1"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
 
-      // Per-series label overrides — shown only when the series exists in the data
-      series_0_label: ds({ id: "series_0_label", title: "Series 1 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
-      series_1_label: ds({ id: "series_1_label", title: "Series 2 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
-      series_2_label: ds({ id: "series_2_label", title: "Series 3 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
-      series_3_label: ds({ id: "series_3_label", title: "Series 4 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
-      series_4_label: ds({ id: "series_4_label", title: "Series 5 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
-      series_5_label: ds({ id: "series_5_label", title: "Series 6 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
-      series_6_label: ds({ id: "series_6_label", title: "Series 7 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
-      series_7_label: ds({ id: "series_7_label", title: "Series 8 — Label", widget: "input", getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
+      series_1_color: ds({ id: "series_1_color", title: "Color", widget: "color", getSection() { return "Series 2"; }, getDefault() { return COLORS[1]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
+      series_1_label: ds({ id: "series_1_label", title: "Label", widget: "input", getSection() { return "Series 2"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
+
+      series_2_color: ds({ id: "series_2_color", title: "Color", widget: "color", getSection() { return "Series 3"; }, getDefault() { return COLORS[2]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
+      series_2_label: ds({ id: "series_2_label", title: "Label", widget: "input", getSection() { return "Series 3"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
+
+      series_3_color: ds({ id: "series_3_color", title: "Color", widget: "color", getSection() { return "Series 4"; }, getDefault() { return COLORS[3]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
+      series_3_label: ds({ id: "series_3_label", title: "Label", widget: "input", getSection() { return "Series 4"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
+
+      series_4_color: ds({ id: "series_4_color", title: "Color", widget: "color", getSection() { return "Series 5"; }, getDefault() { return COLORS[4]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
+      series_4_label: ds({ id: "series_4_label", title: "Label", widget: "input", getSection() { return "Series 5"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
+
+      series_5_color: ds({ id: "series_5_color", title: "Color", widget: "color", getSection() { return "Series 6"; }, getDefault() { return COLORS[5]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
+      series_5_label: ds({ id: "series_5_label", title: "Label", widget: "input", getSection() { return "Series 6"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
+
+      series_6_color: ds({ id: "series_6_color", title: "Color", widget: "color", getSection() { return "Series 7"; }, getDefault() { return COLORS[6]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
+      series_6_label: ds({ id: "series_6_label", title: "Label", widget: "input", getSection() { return "Series 7"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
+
+      series_7_color: ds({ id: "series_7_color", title: "Color", widget: "color", getSection() { return "Series 8"; }, getDefault() { return COLORS[7]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
+      series_7_label: ds({ id: "series_7_label", title: "Label", widget: "input", getSection() { return "Series 8"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
     },
 
     VisualizationComponent: WaffleChart,
