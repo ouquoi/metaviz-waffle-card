@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { type CustomVisualizationProps } from "@metabase/custom-viz";
 import type { Settings } from "./types";
 import { isNumericCol, largestRemainder } from "./utils";
@@ -17,7 +17,9 @@ interface Category {
   color: string;
 }
 
-const GAP = 4;
+const GAP = 3;
+const MARGIN = 6;
+const LEGEND_H = 28;
 const ANIM = `@keyframes waffleIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}`;
 
 export function WaffleChart({
@@ -30,6 +32,22 @@ export function WaffleChart({
 }: CustomVisualizationProps<Settings>) {
   const [hoveredCat, setHoveredCat] = useState<number | null>(null);
 
+  // ResizeObserver — true responsive sizing independent of props
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [cw, setCw] = useState<number>(width ?? 0);
+  const [ch, setCh] = useState<number>(height ?? 0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width: w, height: h } = entry.contentRect;
+      if (w > 0 && h > 0) { setCw(Math.floor(w)); setCh(Math.floor(h)); }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const gridColumns = settings?.gridColumns ?? 20;
   const gridRows = settings?.gridRows ?? 5;
   const mode = settings?.mode ?? "percent";
@@ -41,7 +59,7 @@ export function WaffleChart({
   const legendValue = settings?.legendValue ?? "percent";
   const isDark = colorScheme === "dark";
 
-  if (!width || !height) return null;
+  if (!cw || !ch) return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 
   const data = series?.[0]?.data;
   if (!data) return null;
@@ -120,26 +138,18 @@ export function WaffleChart({
   });
   while (seq.length < totalCells) seq.push(-1);
 
-  // Layout — le SVG prend toute la hauteur sauf la légende
-  const LEGEND_H = showLegend && categories.length > 0 ? 30 : 0;
-  const svgH = height - LEGEND_H;
-  const MARGIN = 8; // marge minimale autour de la grille
+  // Layout — cellules rectangulaires qui remplissent les deux axes
+  const legendVisible = showLegend && categories.length > 0;
+  const svgH = ch - (legendVisible ? LEGEND_H : 0);
 
-  const cellSize = Math.max(
-    4,
-    Math.floor(
-      Math.min(
-        (width - 2 * MARGIN - GAP * (gridColumns - 1)) / gridColumns,
-        (svgH - 2 * MARGIN - GAP * (gridRows - 1)) / gridRows,
-      ),
-    ),
-  );
+  // cellW et cellH indépendants — pas de contrainte carré
+  const cellW = Math.max(4, Math.floor((cw - 2 * MARGIN - GAP * (gridColumns - 1)) / gridColumns));
+  const cellH = Math.max(4, Math.floor((svgH - 2 * MARGIN - GAP * (gridRows - 1)) / gridRows));
 
-  const gridW = cellSize * gridColumns + GAP * (gridColumns - 1);
-  const gridH = cellSize * gridRows + GAP * (gridRows - 1);
-  // Centrer la grille dans le SVG dans les deux axes
-  const gx = (width - gridW) / 2;
-  const gy = (svgH - gridH) / 2;
+  const gridW = cellW * gridColumns + GAP * (gridColumns - 1);
+  const gridH = cellH * gridRows + GAP * (gridRows - 1);
+  const gx = Math.round((cw - gridW) / 2);
+  const gy = Math.round((svgH - gridH) / 2);
 
   // Map linear index → grid position
   function cellPos(idx: number): { col: number; row: number } {
@@ -164,6 +174,7 @@ export function WaffleChart({
 
   return (
     <div
+      ref={containerRef}
       style={{
         width: "100%",
         height: "100%",
@@ -205,7 +216,7 @@ export function WaffleChart({
 
       {/* SVG waffle grid */}
       <svg
-        width={width}
+        width={cw}
         height={svgH}
         style={{ display: "block", flexShrink: 0 }}
         onMouseLeave={() => setHoveredCat(null)}
@@ -215,8 +226,8 @@ export function WaffleChart({
         </defs>
         {seq.map((catIdx, idx) => {
           const { col, row } = cellPos(idx);
-          const x = gx + col * (cellSize + GAP);
-          const y = gy + row * (cellSize + GAP);
+          const x = gx + col * (cellW + GAP);
+          const y = gy + row * (cellH + GAP);
           const color = catIdx >= 0 ? categories[catIdx].color : emptyColor;
           const dim = hoveredCat !== null && catIdx !== hoveredCat;
           return (
@@ -247,9 +258,9 @@ export function WaffleChart({
               <rect
                 x={x}
                 y={y}
-                width={cellSize}
-                height={cellSize}
-                rx={Math.max(2, Math.round(cellSize * 0.18))}
+                width={cellW}
+                height={cellH}
+                rx={Math.max(2, Math.round(Math.min(cellW, cellH) * 0.18))}
                 fill={color}
                 style={{
                   animation: `waffleIn 0.28s ease-out both`,
@@ -264,7 +275,7 @@ export function WaffleChart({
       </svg>
 
       {/* Legend */}
-      {showLegend && categories.length > 0 && (
+      {legendVisible && (
         <div
           style={{
             display: "flex",
