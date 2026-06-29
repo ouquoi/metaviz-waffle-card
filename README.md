@@ -46,15 +46,15 @@ Click the **gear icon** to open visualization settings:
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| **Colonnes** | Number of columns in the grid | `20` |
-| **Lignes** | Number of rows in the grid | `5` |
+| **Columns** | Number of columns in the grid | `20` |
+| **Rows** | Number of rows in the grid | `5` |
 | **Mode** | `percent` — fills the grid proportionally (total = columns × rows cells). `unit` — assigns 1 cell per N data units | `percent` |
-| **Unités par case** | In `unit` mode: how many data units each cell represents | `1` |
-| **Direction** | `row-left-right` — fills left-to-right by row. `col-bottom-up` — fills bottom-to-top by column | `row-left-right` |
-| **Tri** | Sort categories: `value_desc` (largest first), `value_asc` (smallest first), `none` (original order) | `value_desc` |
-| **Min 1 case** | Guarantees every non-zero category gets at least 1 cell, even if its share rounds down to 0 | On |
-| **Afficher la légende** | Show or hide the legend below the grid | On |
-| **Valeur légende** | What to show per legend item: `percent`, `value`, or `both` | `percent` |
+| **Units per cell** | In `unit` mode: how many data units each cell represents | `1` |
+| **Fill direction** | `Row, left to right` — fills left-to-right by row. `Column, bottom to top` — fills bottom-to-top by column | `Row, left to right` |
+| **Sort** | Sort categories: `Value descending` (largest first), `Value ascending` (smallest first), `Original order` | `Value descending` |
+| **Minimum 1 cell per category** | Guarantees every non-zero category gets at least 1 cell, even if its share rounds down to 0 | On |
+| **Show legend** | Show or hide the legend below the grid | On |
+| **Legend value** | What to show per legend item: `Percent`, `Value`, or `Both` | `Percent` |
 
 ---
 
@@ -62,6 +62,7 @@ Click the **gear icon** to open visualization settings:
 
 | Feature | Details |
 |---------|---------|
+| **Responsive sizing** | The grid scales to fill the card at any size — cells grow and shrink automatically |
 | **Reveal animation** | Each cell fades in with a staggered 7 ms delay — the full grid animates in ~700 ms |
 | **Largest-remainder algorithm** | Guarantees cell counts sum exactly to the grid total (avoids off-by-one rounding errors) |
 | **Hover highlight** | Hovering a cell or legend item fades out all other categories |

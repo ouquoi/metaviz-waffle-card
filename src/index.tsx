@@ -14,11 +14,11 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
 
     checkRenderable(series) {
       if (!series || series.length === 0) {
-        throw new Error("Sélectionnez une dimension et une mesure");
+        throw new Error("Select a dimension and a metric");
       }
       const data = series[0]?.data;
       if (!data) {
-        throw new Error("Sélectionnez une dimension et une mesure");
+        throw new Error("Select a dimension and a metric");
       }
       const cols = data.cols;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,14 +26,14 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const hasMetric = (cols as any[]).some((c) => isNumericCol(c));
       if (!hasDimension || !hasMetric) {
-        throw new Error("Sélectionnez une dimension et une mesure");
+        throw new Error("Select a dimension and a metric");
       }
     },
 
     settings: {
       gridColumns: defineSetting({
         id: "gridColumns",
-        title: "Colonnes",
+        title: "Columns",
         widget: "number",
         getDefault() {
           return 20;
@@ -41,7 +41,7 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
       }),
       gridRows: defineSetting({
         id: "gridRows",
-        title: "Lignes",
+        title: "Rows",
         widget: "number",
         getDefault() {
           return 5;
@@ -57,15 +57,15 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         getProps() {
           return {
             options: [
-              { name: "Pourcentage (1 case = 1 %)", value: "percent" },
-              { name: "Unité (N unités par case)", value: "unit" },
+              { name: "Percent (1 cell = 1%)", value: "percent" },
+              { name: "Unit (N units per cell)", value: "unit" },
             ],
           };
         },
       }),
       unitsPerCell: defineSetting({
         id: "unitsPerCell",
-        title: "Unités par case (mode unité)",
+        title: "Units per cell",
         widget: "number",
         getDefault() {
           return 1;
@@ -73,7 +73,7 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
       }),
       fillDirection: defineSetting({
         id: "fillDirection",
-        title: "Direction de remplissage",
+        title: "Fill direction",
         widget: "select",
         getDefault() {
           return "row-left-right";
@@ -81,15 +81,15 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         getProps() {
           return {
             options: [
-              { name: "Colonne, bas vers haut", value: "col-bottom-up" },
-              { name: "Ligne, gauche à droite", value: "row-left-right" },
+              { name: "Row, left to right", value: "row-left-right" },
+              { name: "Column, bottom to top", value: "col-bottom-up" },
             ],
           };
         },
       }),
       sort: defineSetting({
         id: "sort",
-        title: "Tri",
+        title: "Sort",
         widget: "select",
         getDefault() {
           return "value_desc";
@@ -97,16 +97,16 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         getProps() {
           return {
             options: [
-              { name: "Valeur décroissante", value: "value_desc" },
-              { name: "Valeur croissante", value: "value_asc" },
-              { name: "Ordre original", value: "none" },
+              { name: "Value descending", value: "value_desc" },
+              { name: "Value ascending", value: "value_asc" },
+              { name: "Original order", value: "none" },
             ],
           };
         },
       }),
       minOneCell: defineSetting({
         id: "minOneCell",
-        title: "Minimum 1 case par catégorie",
+        title: "Minimum 1 cell per category",
         widget: "toggle",
         getDefault() {
           return true;
@@ -114,7 +114,7 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
       }),
       showLegend: defineSetting({
         id: "showLegend",
-        title: "Afficher la légende",
+        title: "Show legend",
         widget: "toggle",
         getDefault() {
           return true;
@@ -122,7 +122,7 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
       }),
       legendValue: defineSetting({
         id: "legendValue",
-        title: "Valeur dans la légende",
+        title: "Legend value",
         widget: "select",
         getDefault() {
           return "percent";
@@ -130,9 +130,9 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         getProps() {
           return {
             options: [
-              { name: "Pourcentage", value: "percent" },
-              { name: "Valeur", value: "value" },
-              { name: "Les deux", value: "both" },
+              { name: "Percent", value: "percent" },
+              { name: "Value", value: "value" },
+              { name: "Both", value: "both" },
             ],
           };
         },
