@@ -20,7 +20,6 @@ interface Category {
 const GAP = 3;
 const MARGIN = 6;
 const LEGEND_H = 28;
-const ANIM = `@keyframes waffleIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}`;
 
 export function WaffleChart({
   series,
@@ -208,9 +207,6 @@ export function WaffleChart({
         style={{ display: "block", flexShrink: 0 }}
         onMouseLeave={() => setHoveredCat(null)}
       >
-        <defs>
-          <style>{ANIM}</style>
-        </defs>
         {seq.map((catIdx, idx) => {
           const { col, row } = cellPos(idx);
           const x = gx + col * (cellW + GAP);
@@ -244,13 +240,17 @@ export function WaffleChart({
                 height={cellH}
                 rx={Math.max(2, Math.round(Math.min(cellW, cellH) * 0.18))}
                 fill={color}
-                style={{
-                  animation: `waffleIn 0.28s ease-out both`,
-                  animationDelay: `${idx * 7}ms`,
-                  transformBox: "fill-box",
-                  transformOrigin: "center",
-                }}
-              />
+                opacity={0}
+              >
+                <animate
+                  attributeName="opacity"
+                  from="0"
+                  to="1"
+                  dur="0.3s"
+                  begin={`${idx * 7}ms`}
+                  fill="freeze"
+                />
+              </rect>
             </g>
           );
         })}
