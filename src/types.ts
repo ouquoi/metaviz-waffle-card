@@ -2,6 +2,7 @@ export type Settings = {
   gridColumns?: number;
   gridRows?: number;
   cellSize?: "auto" | "xs" | "s" | "m" | "l" | "xl";
+  cellShape?: "rounded" | "square" | "circle" | "diamond" | "cross" | "star";
   mode?: "percent" | "unit";
   unitsPerCell?: number;
   fillDirection?: "col-bottom-up" | "row-left-right";

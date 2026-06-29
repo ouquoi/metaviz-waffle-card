@@ -68,6 +68,24 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         widget: "number",
         getDefault() { return 5; },
       }),
+      cellShape: defineSetting({
+        id: "cellShape",
+        title: "Cell shape",
+        widget: "select",
+        getDefault() { return "rounded"; },
+        getProps() {
+          return {
+            options: [
+              { name: "Rounded square", value: "rounded" },
+              { name: "Square", value: "square" },
+              { name: "Circle", value: "circle" },
+              { name: "Diamond", value: "diamond" },
+              { name: "Cross", value: "cross" },
+              { name: "Star", value: "star" },
+            ],
+          };
+        },
+      }),
       cellSize: defineSetting({
         id: "cellSize",
         title: "Cell size",

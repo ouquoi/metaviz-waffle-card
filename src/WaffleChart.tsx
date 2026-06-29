@@ -21,6 +21,62 @@ const GAP = 3;
 const MARGIN = 6;
 const LEGEND_H = 28;
 
+type Shape = "rounded" | "square" | "circle" | "diamond" | "cross" | "star";
+
+function CellShape({
+  shape, x, y, w, h, rx, fill, animBegin,
+}: {
+  shape: Shape; x: number; y: number; w: number; h: number;
+  rx: number; fill: string; animBegin: string;
+}) {
+  const anim = (
+    <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin={animBegin} fill="freeze" />
+  );
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
+  if (shape === "square") {
+    return <rect x={x} y={y} width={w} height={h} rx={0} fill={fill} opacity={0}>{anim}</rect>;
+  }
+  if (shape === "circle") {
+    return <rect x={x} y={y} width={w} height={h} rx={Math.min(w, h) / 2} fill={fill} opacity={0}>{anim}</rect>;
+  }
+  if (shape === "diamond") {
+    const pts = `${cx},${y} ${x + w},${cy} ${cx},${y + h} ${x},${cy}`;
+    return <polygon points={pts} fill={fill} opacity={0}>{anim}</polygon>;
+  }
+  if (shape === "cross") {
+    const t = 0.3;
+    const d = [
+      `M ${x + w * t} ${y}`,
+      `L ${x + w * (1 - t)} ${y}`,
+      `L ${x + w * (1 - t)} ${y + h * t}`,
+      `L ${x + w} ${y + h * t}`,
+      `L ${x + w} ${y + h * (1 - t)}`,
+      `L ${x + w * (1 - t)} ${y + h * (1 - t)}`,
+      `L ${x + w * (1 - t)} ${y + h}`,
+      `L ${x + w * t} ${y + h}`,
+      `L ${x + w * t} ${y + h * (1 - t)}`,
+      `L ${x} ${y + h * (1 - t)}`,
+      `L ${x} ${y + h * t}`,
+      `L ${x + w * t} ${y + h * t} Z`,
+    ].join(" ");
+    return <path d={d} fill={fill} opacity={0}>{anim}</path>;
+  }
+  if (shape === "star") {
+    const outerR = Math.min(w, h) / 2;
+    const innerR = outerR * 0.42;
+    const pts = Array.from({ length: 10 }, (_, i) => {
+      const r = i % 2 === 0 ? outerR : innerR;
+      const a = (Math.PI / 5) * i - Math.PI / 2;
+      return `${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`;
+    }).join(" ");
+    return <polygon points={pts} fill={fill} opacity={0}>{anim}</polygon>;
+  }
+  // default: rounded
+  return <rect x={x} y={y} width={w} height={h} rx={rx} fill={fill} opacity={0}>{anim}</rect>;
+}
+
 export function WaffleChart({
   series,
   settings,
@@ -39,6 +95,7 @@ export function WaffleChart({
   const gridColumns = settings?.gridColumns ?? 20;
   const gridRows = settings?.gridRows ?? 5;
   const cellSize = settings?.cellSize ?? "auto";
+  const cellShape = (settings?.cellShape ?? "rounded") as Shape;
   const mode = settings?.mode ?? "percent";
   const unitsPerCell = Math.max(1, settings?.unitsPerCell ?? 1);
   const fillDirection = settings?.fillDirection ?? "row-left-right";
@@ -244,24 +301,16 @@ export function WaffleChart({
                 }
               }}
             >
-              <rect
+              <CellShape
+                shape={cellShape}
                 x={x}
                 y={y}
-                width={cellW}
-                height={cellH}
+                w={cellW}
+                h={cellH}
                 rx={Math.max(2, Math.round(Math.min(cellW, cellH) * 0.18))}
                 fill={color}
-                opacity={0}
-              >
-                <animate
-                  attributeName="opacity"
-                  from="0"
-                  to="1"
-                  dur="0.3s"
-                  begin={`${idx * 7}ms`}
-                  fill="freeze"
-                />
-              </rect>
+                animBegin={`${idx * 7}ms`}
+              />
             </g>
           );
         })}
