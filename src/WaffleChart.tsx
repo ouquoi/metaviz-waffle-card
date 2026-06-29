@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { type CustomVisualizationProps } from "@metabase/custom-viz";
 import type { Settings } from "./types";
 import { isNumericCol, largestRemainder } from "./utils";
@@ -32,21 +32,10 @@ export function WaffleChart({
 }: CustomVisualizationProps<Settings>) {
   const [hoveredCat, setHoveredCat] = useState<number | null>(null);
 
-  // ResizeObserver — true responsive sizing independent of props
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [cw, setCw] = useState<number>(width ?? 0);
-  const [ch, setCh] = useState<number>(height ?? 0);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      const { width: w, height: h } = entry.contentRect;
-      if (w > 0 && h > 0) { setCw(Math.floor(w)); setCh(Math.floor(h)); }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  const isDark = colorScheme === "dark";
+  const bgColor = isDark ? "#1c1c1c" : "#ffffff";
+  const textColor = isDark ? "#cccccc" : "#696e7b";
+  const emptyColor = isDark ? "#3a3a3a" : "#e8e8e8";
 
   const gridColumns = settings?.gridColumns ?? 20;
   const gridRows = settings?.gridRows ?? 5;
@@ -57,9 +46,12 @@ export function WaffleChart({
   const minOneCell = settings?.minOneCell ?? true;
   const showLegend = settings?.showLegend ?? true;
   const legendValue = settings?.legendValue ?? "percent";
-  const isDark = colorScheme === "dark";
 
-  if (!cw || !ch) return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
+  // Use props directly — Metabase passes correct dimensions per card size
+  const cw = (width ?? 0) > 0 ? Math.floor(width ?? 0) : 0;
+  const ch = (height ?? 0) > 0 ? Math.floor(height ?? 0) : 0;
+
+  if (!cw || !ch) return null;
 
   const data = series?.[0]?.data;
   if (!data) return null;
@@ -81,6 +73,8 @@ export function WaffleChart({
       };
     })
     .filter((c) => c.value > 0);
+
+  if (categories.length === 0) return null;
 
   if (sort === "value_desc") categories.sort((a, b) => b.value - a.value);
   else if (sort === "value_asc") categories.sort((a, b) => a.value - b.value);
@@ -131,18 +125,17 @@ export function WaffleChart({
     }
   }
 
-  // Build flat sequence — row-by-row or col-bottom-up
+  // Flat sequence of category indices
   const seq: number[] = [];
   categories.forEach((_, i) => {
     for (let k = 0; k < cellCounts[i]; k++) seq.push(i);
   });
   while (seq.length < totalCells) seq.push(-1);
 
-  // Layout — cellules rectangulaires qui remplissent les deux axes
+  // Layout — cellW and cellH independent so the grid fills both axes
   const legendVisible = showLegend && categories.length > 0;
   const svgH = ch - (legendVisible ? LEGEND_H : 0);
 
-  // cellW et cellH indépendants — pas de contrainte carré
   const cellW = Math.max(4, Math.floor((cw - 2 * MARGIN - GAP * (gridColumns - 1)) / gridColumns));
   const cellH = Math.max(4, Math.floor((svgH - 2 * MARGIN - GAP * (gridRows - 1)) / gridRows));
 
@@ -151,20 +144,14 @@ export function WaffleChart({
   const gx = Math.round((cw - gridW) / 2);
   const gy = Math.round((svgH - gridH) / 2);
 
-  // Map linear index → grid position
   function cellPos(idx: number): { col: number; row: number } {
     if (fillDirection === "row-left-right") {
       return { col: idx % gridColumns, row: Math.floor(idx / gridColumns) };
     }
-    // col-bottom-up: fill column by column, each column from bottom to top
     const col = Math.floor(idx / gridRows);
     const row = gridRows - 1 - (idx % gridRows);
     return { col, row };
   }
-
-  const emptyColor = isDark ? "#3a3a3a" : "#e8e8e8";
-  const bgColor = isDark ? "#1c1c1c" : "#ffffff";
-  const textColor = isDark ? "#cccccc" : "#696e7b";
 
   const hovered = hoveredCat !== null ? categories[hoveredCat] : null;
   const hoveredPct =
@@ -174,15 +161,15 @@ export function WaffleChart({
 
   return (
     <div
-      ref={containerRef}
       style={{
-        width: "100%",
-        height: "100%",
+        width: cw,
+        height: ch,
         backgroundColor: bgColor,
         display: "flex",
         flexDirection: "column",
         position: "relative",
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       {/* Tooltip */}
@@ -238,18 +225,13 @@ export function WaffleChart({
                 transition: "opacity 0.15s",
                 cursor: catIdx >= 0 ? "pointer" : "default",
               }}
-              onMouseEnter={() =>
-                setHoveredCat(catIdx >= 0 ? catIdx : null)
-              }
+              onMouseEnter={() => setHoveredCat(catIdx >= 0 ? catIdx : null)}
               onClick={() => {
                 if (catIdx >= 0 && onClick) {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   (onClick as any)({
                     dimensions: [
-                      {
-                        value: categories[catIdx].label,
-                        column: cols[dimIdx],
-                      },
+                      { value: categories[catIdx].label, column: cols[dimIdx] },
                     ],
                   });
                 }
@@ -282,8 +264,11 @@ export function WaffleChart({
             flexWrap: "wrap",
             gap: "3px 14px",
             justifyContent: "center",
-            padding: "4px 12px 6px",
+            alignItems: "center",
+            height: LEGEND_H,
+            padding: "0 12px",
             flexShrink: 0,
+            overflow: "hidden",
           }}
         >
           {categories.map((cat, i) => {
@@ -318,9 +303,7 @@ export function WaffleChart({
                   if (onClick) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (onClick as any)({
-                      dimensions: [
-                        { value: cat.label, column: cols[dimIdx] },
-                      ],
+                      dimensions: [{ value: cat.label, column: cols[dimIdx] }],
                     });
                   }
                 }}
