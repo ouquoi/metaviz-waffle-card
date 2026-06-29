@@ -78,6 +78,13 @@ export function WaffleChart({
   if (sort === "value_desc") categories.sort((a, b) => b.value - a.value);
   else if (sort === "value_asc") categories.sort((a, b) => a.value - b.value);
 
+  // Apply per-category color and label overrides (indexed by sorted display order)
+  categories = categories.map((cat, i) => ({
+    ...cat,
+    color: (settings?.[`series_${i}_color` as keyof Settings] as string | undefined) || cat.color,
+    label: ((settings?.[`series_${i}_label` as keyof Settings] as string | undefined) || "").trim() || cat.label,
+  }));
+
   const totalCells = gridColumns * gridRows;
   const totalValue = categories.reduce((s, c) => s + c.value, 0);
 
