@@ -195,29 +195,29 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
       }),
 
       // ── Series (one section per series, shown only if series exists) ────
-      series_0_color: ds({ id: "series_0_color", title: "Color", widget: "color", getSection() { return "Series 1"; }, getDefault() { return COLORS[0]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
-      series_0_label: ds({ id: "series_0_label", title: "Label", widget: "input", getSection() { return "Series 1"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
+      series_0_color: ds({ id: "series_0_color", title: "Series 1 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[0]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
+      series_0_label: ds({ id: "series_0_label", title: "Series 1 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 1; } }),
 
-      series_1_color: ds({ id: "series_1_color", title: "Color", widget: "color", getSection() { return "Series 2"; }, getDefault() { return COLORS[1]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
-      series_1_label: ds({ id: "series_1_label", title: "Label", widget: "input", getSection() { return "Series 2"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
+      series_1_color: ds({ id: "series_1_color", title: "Series 2 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[1]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
+      series_1_label: ds({ id: "series_1_label", title: "Series 2 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 2; } }),
 
-      series_2_color: ds({ id: "series_2_color", title: "Color", widget: "color", getSection() { return "Series 3"; }, getDefault() { return COLORS[2]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
-      series_2_label: ds({ id: "series_2_label", title: "Label", widget: "input", getSection() { return "Series 3"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
+      series_2_color: ds({ id: "series_2_color", title: "Series 3 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[2]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
+      series_2_label: ds({ id: "series_2_label", title: "Series 3 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 3; } }),
 
-      series_3_color: ds({ id: "series_3_color", title: "Color", widget: "color", getSection() { return "Series 4"; }, getDefault() { return COLORS[3]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
-      series_3_label: ds({ id: "series_3_label", title: "Label", widget: "input", getSection() { return "Series 4"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
+      series_3_color: ds({ id: "series_3_color", title: "Series 4 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[3]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
+      series_3_label: ds({ id: "series_3_label", title: "Series 4 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
 
-      series_4_color: ds({ id: "series_4_color", title: "Color", widget: "color", getSection() { return "Series 5"; }, getDefault() { return COLORS[4]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
-      series_4_label: ds({ id: "series_4_label", title: "Label", widget: "input", getSection() { return "Series 5"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
+      series_4_color: ds({ id: "series_4_color", title: "Series 5 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[4]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
+      series_4_label: ds({ id: "series_4_label", title: "Series 5 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
 
-      series_5_color: ds({ id: "series_5_color", title: "Color", widget: "color", getSection() { return "Series 6"; }, getDefault() { return COLORS[5]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
-      series_5_label: ds({ id: "series_5_label", title: "Label", widget: "input", getSection() { return "Series 6"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
+      series_5_color: ds({ id: "series_5_color", title: "Series 6 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[5]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
+      series_5_label: ds({ id: "series_5_label", title: "Series 6 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
 
-      series_6_color: ds({ id: "series_6_color", title: "Color", widget: "color", getSection() { return "Series 7"; }, getDefault() { return COLORS[6]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
-      series_6_label: ds({ id: "series_6_label", title: "Label", widget: "input", getSection() { return "Series 7"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
+      series_6_color: ds({ id: "series_6_color", title: "Series 7 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[6]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
+      series_6_label: ds({ id: "series_6_label", title: "Series 7 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
 
-      series_7_color: ds({ id: "series_7_color", title: "Color", widget: "color", getSection() { return "Series 8"; }, getDefault() { return COLORS[7]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
-      series_7_label: ds({ id: "series_7_label", title: "Label", widget: "input", getSection() { return "Series 8"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
+      series_7_color: ds({ id: "series_7_color", title: "Series 8 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[7]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
+      series_7_label: ds({ id: "series_7_label", title: "Series 8 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
     },
 
     VisualizationComponent: WaffleChart,

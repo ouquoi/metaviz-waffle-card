@@ -75,14 +75,14 @@ Click the **gear icon** to open visualization settings. Settings are organized i
 | **Show legend** | Show or hide the legend below the grid | On |
 | **Legend value** | What to show per legend item: `Percent`, `Value`, or `Both` | `Percent` |
 
-#### Series 1 … Series N
+#### Series
 
-One section per series present in the data (up to 8), shown dynamically based on query results.
+Color and label overrides for each series present in the data (up to 8). Settings are shown dynamically — only the series that exist in the query results appear.
 
 | Setting | Description |
 |---------|-------------|
-| **Color** | Custom color for this series |
-| **Label** | Custom display name (overrides the raw value from the query) |
+| **Series N — Color** | Custom color for series N |
+| **Series N — Label** | Custom display name for series N (overrides the raw value from the query) |
 
 Series are indexed in the sorted display order (as configured by the **Sort** setting).
 
