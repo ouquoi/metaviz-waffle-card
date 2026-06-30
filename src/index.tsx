@@ -206,18 +206,6 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
 
       series_3_color: ds({ id: "series_3_color", title: "Series 4 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[3]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
       series_3_label: ds({ id: "series_3_label", title: "Series 4 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 4; } }),
-
-      series_4_color: ds({ id: "series_4_color", title: "Series 5 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[4]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
-      series_4_label: ds({ id: "series_4_label", title: "Series 5 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 5; } }),
-
-      series_5_color: ds({ id: "series_5_color", title: "Series 6 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[5]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
-      series_5_label: ds({ id: "series_5_label", title: "Series 6 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 6; } }),
-
-      series_6_color: ds({ id: "series_6_color", title: "Series 7 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[6]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
-      series_6_label: ds({ id: "series_6_label", title: "Series 7 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 7; } }),
-
-      series_7_color: ds({ id: "series_7_color", title: "Series 8 — Color", widget: "color", getSection() { return "Series"; }, getDefault() { return COLORS[7]; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
-      series_7_label: ds({ id: "series_7_label", title: "Series 8 — Label", widget: "input", getSection() { return "Series"; }, getDefault() { return ""; }, getHidden(s: any, e?: any) { return seriesCount(s, e) < 8; } }),
     },
 
     VisualizationComponent: WaffleChart,

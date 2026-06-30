@@ -77,7 +77,7 @@ Click the **gear icon** to open visualization settings. Settings are organized i
 
 #### Series
 
-Color and label overrides for each series present in the data (up to 8). Settings are shown dynamically — only the series that exist in the query results appear.
+Color and label overrides for each series present in the data (up to 4). Settings are shown dynamically — only the series that exist in the query results appear.
 
 | Setting | Description |
 |---------|-------------|
